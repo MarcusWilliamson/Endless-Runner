@@ -1,6 +1,7 @@
 /*
 Main header
 
+4 hours
 
 Ideas:
 - Pinball moving upwards, hit with paddles around the map
@@ -23,8 +24,9 @@ let config = {
     scene: [Menu, Play],
     fps: {
         forceSetTimeOut: true,
-        target: 60
+        target: 30
     }
+    
 }
 
 let game = new Phaser.Game(config);
