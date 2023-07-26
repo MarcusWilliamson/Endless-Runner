@@ -12,19 +12,39 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        // add slime (player)
-        //this.playerSlime = new Slime(this, game.config.width / 15, game.config.height - game.config.height / 15, 'slime').setOrigin(0.5, 0);
+        // Variables
         this.maxYVel = 3000;
-        this.jumpVelocity = -1000;
+        this.jumpVelocity = -700;
+        //this.stageSpeed = 300;
+        this.stageSpeed = 10;
+        this.moving = true;
 
         this.player = this.physics.add.sprite(this.game.config.width / 10, game.config.height - game.config.height / 2, 'skater').setOrigin(0.5, 0);
         this.player.setMaxVelocity(500, this.maxYVel);
 
         this.jumping = false;
 
-        this.ground = this.physics.add.sprite(0, game.config.height - 64, 'ground1').setOrigin(0);
-        this.ground.body.immovable = true;
-        this.ground.body.allowGravity = false;
+        // Adding the ground
+        this.ground = this.add.group();
+        this.tiles = [];
+
+        this.ground1 = this.physics.add.sprite(0, game.config.height - 64, 'ground1').setOrigin(0);
+        this.ground1.body.immovable = true;
+        this.ground1.body.allowGravity = false;
+        this.ground.add(this.ground1);
+
+        this.tile1 = this.physics.add.sprite(game.config.width - 32, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
+        this.tile1.body.immovable = true;
+        this.tile1.body.allowGravity = false;
+        this.ground.add(this.tile1);
+        this.tiles.push(this.tile1);
+
+        this.tile2 = this.physics.add.sprite(game.config.width - 64, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
+        this.tile2.body.immovable = true;
+        this.tile2.body.allowGravity = false;
+        this.ground.add(this.tile2);
+        this.tiles.push(this.tile2);
+
         this.physics.add.collider(this.player, this.ground);
         
         this.anims.create({
@@ -47,7 +67,8 @@ class Play extends Phaser.Scene {
     }
 
     update(time, delta) {
-        console.log(this.jumping);
+
+        // PLAYER MOVEMENT
         if (this.player.body.touching.down) {
             // If on ground but jumping is true, set to false and start cruise animation
             if (this.jumping) {
@@ -66,5 +87,40 @@ class Play extends Phaser.Scene {
             this.player.play('jump');
         }
 
+        /*if (this.player.body.touching.right) {
+            console.log('bump');
+            this.moving = false;
+            //for (let tile of this.tiles) {
+            //     tile.body.setVelocityX(0);
+            //}
+        }*/
+
+        for (let tile of this.tiles) {
+            if (this.checkCollision(this.player, tile)) {
+                console.log('collision');
+                this.moving = false;
+            }
+        }
+        
+
+        // TILE MOVEMENT
+        if (this.moving) {
+            for (let tile of this.tiles) {
+                //tile.body.setVelocityX(-this.stageSpeed);
+                tile.x -= this.stageSpeed;
+            }
+        }
+    }
+
+    checkCollision(player, other) {
+        // simple AABB checking (Axis-Aligned Bounding Boxes)
+        if (player.x < other.x + other.width &&
+            player.x + player.width > other.x &&
+            player.y < other.y + other.height &&
+            player.height + player.y > other.y) {
+                return true;
+        } else {
+            return false;
+        }
     }
 }

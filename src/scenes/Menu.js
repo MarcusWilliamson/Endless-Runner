@@ -19,7 +19,7 @@ class Menu extends Phaser.Scene {
         }
 
         // show menu text
-        this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 15, 'Slimeblock Run', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 15, 'Skate Forever', menuConfig).setOrigin(0.5);
         this.add.text(game.config.width / 2, game.config.height / 2, 'Press SPACE to start', menuConfig).setOrigin(0.5);
 
         // define keys
