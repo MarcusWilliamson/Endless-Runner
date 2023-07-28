@@ -17,7 +17,8 @@ class Play extends Phaser.Scene {
         this.jumpVelocity = -700;
         this.stageSpeed = 10;
         this.moving = true;
-        this.railMultiplier = 2;
+        this.minPlatformLength = 2;
+        this.maxPlatformLength = 5;
 
         // Score
         this.score = 0;
@@ -52,18 +53,20 @@ class Play extends Phaser.Scene {
         this.ground.add(this.ground1);
 
         //this.tile1 = this.physics.add.sprite(game.config.width - 32, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
-        this.tile1 = new Tile(this, game.config.width - 32, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+        /*this.tile1 = new Tile(this, game.config.width - 32, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
         this.tile1.body.immovable = true;
         this.tile1.body.allowGravity = false;
         this.ground.add(this.tile1);
-        this.tiles.push(this.tile1);
+        this.tiles.push(this.tile1);*/
 
         //this.tile2 = this.physics.add.sprite(game.config.width - 64, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
-        this.tile2 = new Tile(this, game.config.width - 64, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+        /*this.tile2 = new Tile(this, game.config.width - 64, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
         this.tile2.body.immovable = true;
         this.tile2.body.allowGravity = false;
         this.ground.add(this.tile2);
-        this.tiles.push(this.tile2);
+        this.tiles.push(this.tile2);*/
+
+        this.spawnPlatform();
 
         this.physics.add.collider(this.player, this.ground);
       
@@ -158,6 +161,18 @@ class Play extends Phaser.Scene {
                 return true;
         } else {
             return false;
+        }
+    }
+
+    spawnPlatform() {
+        let size = Math.floor(Math.random() * (this.maxPlatformLength - this.minPlatformLength) + this.minPlatformLength);
+        console.log(size);
+        for (let i = 0; i < size; i++) {
+            let tile = new Tile(this, game.config.width - 32 * (i + 1), game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+            tile.body.immovable = true;
+            tile.body.allowGravity = false;
+            this.ground.add(tile);
+            this.tiles.push(tile);
         }
     }
 }
