@@ -124,8 +124,11 @@ class Play extends Phaser.Scene {
         // TILES
         for (let tile of this.tiles) {
             // collisions
-            if (this.checkCollision(this.player, tile)) {
+            /*if (this.checkCollision(this.player, tile)) {
                 console.log('collision');
+                this.moving = false;
+            }*/
+            if (tile.checkCollision(this.player)) {
                 this.moving = false;
             }
             // scoring
