@@ -16,12 +16,14 @@ class Play extends Phaser.Scene {
         this.maxYVel = 3000;
         this.jumpVelocity = -700;
         this.stageSpeed = 7;
-        this.gameOver = false;
         this.minPlatformLength = 1;
         this.maxPlatformLength = 5;
         this.maxHazardLength = 3;
         this.spawnInterval = 2000;
         this.minSpawnInterval = 800;
+
+        this.gameOver = false;
+        this.canReturnToMenu = false;
 
         // Score
         this.score = 0;
@@ -85,6 +87,25 @@ class Play extends Phaser.Scene {
 
         // define keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // Gameover screen text
+        let menuConfig = {
+            fontFamily: 'Courier',
+            fontSize: '24px',
+            backgroundColor: '#F3B141',
+            color: '#000000',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+
+        this.gameOverText = this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 15, 'Game Over', menuConfig).setOrigin(0.5);
+        this.returnText = this.add.text(game.config.width / 2, game.config.height / 2, 'Press SPACE to return to menu', menuConfig).setOrigin(0.5);
+        this.gameOverText.alpha = 0;
+        this.returnText.alpha = 0;
     }
 
     update(time, delta) {
@@ -158,6 +179,11 @@ class Play extends Phaser.Scene {
                 tile.x -= this.stageSpeed;
             }
         }
+
+        if(this.canReturnToMenu && Phaser.Input.Keyboard.JustDown(keySPACE)) {
+            console.log('test');
+            this.scene.start('menuScene');
+        }
     }
 
     // Spawn platform of random length between max and min
@@ -187,5 +213,10 @@ class Play extends Phaser.Scene {
     endGame() {
         this.gameOver = true;
         this.player.play('fall');
+        this.player.on('animationcomplete', () => {
+            this.gameOverText.alpha = 1;
+            this.returnText.alpha = 1;
+        });
+        this.canReturnToMenu = true;
     }
 }
