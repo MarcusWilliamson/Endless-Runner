@@ -14,13 +14,14 @@ class Play extends Phaser.Scene {
     create() {
         // Variables
         this.maxYVel = 3000;
-        this.jumpVelocity = -800;
-        this.stageSpeed = 12;
+        this.jumpVelocity = -700;
+        this.stageSpeed = 7;
         this.gameOver = false;
         this.minPlatformLength = 1;
         this.maxPlatformLength = 5;
         this.maxHazardLength = 3;
-        this.spawnInterval = 3000;
+        this.spawnInterval = 2000;
+        this.minSpawnInterval = 800;
 
         // Score
         this.score = 0;
@@ -57,23 +58,6 @@ class Play extends Phaser.Scene {
         this.ground1.body.allowGravity = false;
         this.ground.add(this.ground1);
 
-        //this.tile1 = this.physics.add.sprite(game.config.width - 32, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
-        /*this.tile1 = new Tile(this, game.config.width - 32, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
-        this.tile1.body.immovable = true;
-        this.tile1.body.allowGravity = false;
-        this.ground.add(this.tile1);
-        this.tiles.push(this.tile1);*/
-
-        //this.tile2 = this.physics.add.sprite(game.config.width - 64, game.config.height - 96, 'tiles', 7).setOrigin(0.25, 0);
-        /*this.tile2 = new Tile(this, game.config.width - 64, game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
-        this.tile2.body.immovable = true;
-        this.tile2.body.allowGravity = false;
-        this.ground.add(this.tile2);
-        this.tiles.push(this.tile2);*/
-
-        //this.spawnPlatform();
-        //this.spawnHazard();
-
         this.physics.add.collider(this.player, this.ground);
       
         // Player animations
@@ -92,6 +76,13 @@ class Play extends Phaser.Scene {
             repeat: 0
         })
 
+        this.anims.create({
+            key: 'fall',
+            frames: this.anims.generateFrameNumbers('skater', {start: 16, end: 22}),
+            frameRate: 14,
+            repeat: 0
+        })
+
         // define keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
@@ -100,7 +91,7 @@ class Play extends Phaser.Scene {
 
         // Score
         if (!this.gameOver) {
-            this.score += delta * 0.002;
+            this.score += delta * 0.001;
         }
         this.displayScore = Math.round(this.score);
         this.scoreText.text = this.displayScore;
@@ -109,10 +100,13 @@ class Play extends Phaser.Scene {
         this.spawnTimer += delta;
         if (this.spawnTimer > this.spawnInterval) {
             this.spawnTimer -= this.spawnInterval;
-            if(Math.random() > 0.6) {
+            if(Math.random() > 0.5) {
                 this.spawnPlatform();
             } else {
                 this.spawnHazard();
+            }
+            if (this.spawnInterval > this.minSpawnInterval) {
+                this.spawnInterval -= 200;
             }
         }
 
@@ -143,20 +137,17 @@ class Play extends Phaser.Scene {
             //}
         }*/
 
-        // Tile collision
+        // Tile collision and scoring
         for (let tile of this.tiles) {
-            // collisions
-            /*if (this.checkCollision(this.player, tile)) {
-                console.log('collision');
-                this.gameOver = true;
-            }*/
-            if (tile.checkCollision(this.player)) {
-                this.gameOver = true;
+            if (tile.checkCollision(this.player) && !this.gameOver) {
+                this.endGame();
             }
             // scoring
-            if (!tile.scored && tile.x < this.player.x) {
-                this.score += tile.scoreValue;
-                tile.scored = true;
+            if (!tile.scored && tile.x < this.player.x + this.player.width && this.player.x < tile.x + tile.width) {
+                if (tile.isHazard || (!tile.isHazard && tile.y - this.player.y < tile.height + 2)) {
+                    this.score += tile.scoreValue;
+                    tile.scored = true;
+                }
             }
         } 
 
@@ -191,5 +182,10 @@ class Play extends Phaser.Scene {
             this.ground.add(tile);
             this.tiles.push(tile);
         }
+    }
+
+    endGame() {
+        this.gameOver = true;
+        this.player.play('fall');
     }
 }

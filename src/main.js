@@ -17,13 +17,13 @@ let config = {
             debug: true,
             gravity: {
                 x: 0,
-                y: 3000
+                y: 2800
             }
         }
     },
     fps: {
         forceSetTimeOut: true,
-        target: 30
+        target: 60
     }
     
 }
