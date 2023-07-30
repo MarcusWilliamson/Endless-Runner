@@ -21,5 +21,17 @@ class Tile extends Phaser.Physics.Arcade.Sprite {
                 return false;
         }
     }
+
+    /*playerStandingOn(player) {
+        // Check if player is standing on this tile
+        if (player.x < this.x + this.width &&
+            player.x + player.width > this.x &&
+            player.y < this.y + this.height &&
+            player.height + player.y > this.y - 1 * this.isHazard) {
+                return true;
+            } else {
+                return false;
+        }
+    }*/
     
 }

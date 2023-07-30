@@ -5,20 +5,22 @@ class Play extends Phaser.Scene {
 
     preload() {
         // load images
-        this.load.image('slime', './assets/slime.png');
         this.load.spritesheet('skater', './assets/skaterSprites.png', {frameWidth: 32, frameHeight: 32});
         this.load.image('ground1', './assets/ground1.png');
         this.load.spritesheet('tiles', './assets/tiles.png', {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet('hazards', './assets/hazards.png', {frameWidth: 32, frameHeight: 32});
     }
 
     create() {
         // Variables
         this.maxYVel = 3000;
-        this.jumpVelocity = -700;
-        this.stageSpeed = 10;
-        this.moving = true;
-        this.minPlatformLength = 2;
+        this.jumpVelocity = -800;
+        this.stageSpeed = 12;
+        this.gameOver = false;
+        this.minPlatformLength = 1;
         this.maxPlatformLength = 5;
+        this.maxHazardLength = 3;
+        this.spawnInterval = 3000;
 
         // Score
         this.score = 0;
@@ -36,6 +38,9 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreText = this.add.text(game.config.width - game.config.width / 4.5, game.config.height / 15, this.displayScore, scoreConfig);
+
+        // Spawn timers
+        this.spawnTimer = this.spawnInterval;
 
         // Player
         this.player = this.physics.add.sprite(this.game.config.width / 10, game.config.height - game.config.height / 2, 'skater').setOrigin(0.5, 0);
@@ -66,7 +71,8 @@ class Play extends Phaser.Scene {
         this.ground.add(this.tile2);
         this.tiles.push(this.tile2);*/
 
-        this.spawnPlatform();
+        //this.spawnPlatform();
+        //this.spawnHazard();
 
         this.physics.add.collider(this.player, this.ground);
       
@@ -93,14 +99,27 @@ class Play extends Phaser.Scene {
     update(time, delta) {
 
         // Score
-        this.score += delta * 0.002;
+        if (!this.gameOver) {
+            this.score += delta * 0.002;
+        }
         this.displayScore = Math.round(this.score);
         this.scoreText.text = this.displayScore;
 
-        // PLAYER MOVEMENT
+        // Spawning
+        this.spawnTimer += delta;
+        if (this.spawnTimer > this.spawnInterval) {
+            this.spawnTimer -= this.spawnInterval;
+            if(Math.random() > 0.6) {
+                this.spawnPlatform();
+            } else {
+                this.spawnHazard();
+            }
+        }
+
+        // Player animation and jumping
         if (this.player.body.touching.down) {
-            // If on ground but jumping is true, set to false and start cruise animation
-            if (this.jumping) {
+            // If on ground but jumping is true and gameOver is false, set to false and start cruise animation
+            if (this.jumping && !this.gameOver) {
                 this.jumping = false;
                 this.player.play('cruise');
             }
@@ -110,7 +129,7 @@ class Play extends Phaser.Scene {
             this.jumping = true;
         }
 
-        if(Phaser.Input.Keyboard.JustDown(keySPACE) && !this.jumping) {
+        if(!this.gameOver && Phaser.Input.Keyboard.JustDown(keySPACE) && !this.jumping) {
             this.player.body.setVelocityY(this.jumpVelocity);
             this.jumping = true;
             this.player.play('jump');
@@ -118,33 +137,31 @@ class Play extends Phaser.Scene {
 
         /*if (this.player.body.touching.right) {
             console.log('bump');
-            this.moving = false;
+            this.gameOver = true;
             //for (let tile of this.tiles) {
             //     tile.body.setVelocityX(0);
             //}
         }*/
 
-        // TILES
+        // Tile collision
         for (let tile of this.tiles) {
             // collisions
             /*if (this.checkCollision(this.player, tile)) {
                 console.log('collision');
-                this.moving = false;
+                this.gameOver = true;
             }*/
             if (tile.checkCollision(this.player)) {
-                this.moving = false;
+                this.gameOver = true;
             }
             // scoring
             if (!tile.scored && tile.x < this.player.x) {
                 this.score += tile.scoreValue;
                 tile.scored = true;
             }
-        }
-        //for
-        
+        } 
 
-        // TILE MOVEMENT
-        if (this.moving) {
+        // Tile movement
+        if (!this.gameOver) {
             for (let tile of this.tiles) {
                 //tile.body.setVelocityX(-this.stageSpeed);
                 tile.x -= this.stageSpeed;
@@ -152,23 +169,23 @@ class Play extends Phaser.Scene {
         }
     }
 
-    checkCollision(player, other) {
-        // simple AABB checking (Axis-Aligned Bounding Boxes)
-        if (player.x < other.x + other.width &&
-            player.x + player.width > other.x &&
-            player.y < other.y + other.height &&
-            player.height + player.y > other.y) {
-                return true;
-        } else {
-            return false;
+    // Spawn platform of random length between max and min
+    spawnPlatform() {
+        let size = Math.floor(Math.random() * (this.maxPlatformLength - this.minPlatformLength + 1) + this.minPlatformLength);
+        for (let i = 0; i < size; i++) {
+            let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+            tile.body.immovable = true;
+            tile.body.allowGravity = false;
+            this.ground.add(tile);
+            this.tiles.push(tile);
         }
     }
 
-    spawnPlatform() {
-        let size = Math.floor(Math.random() * (this.maxPlatformLength - this.minPlatformLength) + this.minPlatformLength);
-        console.log(size);
+    // Spawn hazard
+    spawnHazard() {
+        let size = Math.floor(Math.random() * (this.maxHazardLength - this.minPlatformLength + 1) + this.minPlatformLength);
         for (let i = 0; i < size; i++) {
-            let tile = new Tile(this, game.config.width - 32 * (i + 1), game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+            let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'hazards', 0, 10, true).setOrigin(0.25, 0);
             tile.body.immovable = true;
             tile.body.allowGravity = false;
             this.ground.add(tile);
