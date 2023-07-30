@@ -2,7 +2,7 @@
 Main header
 Marcus Williamson
 Skate Forever
-12 hours
+12.5 hours
 
 */
 
@@ -10,7 +10,7 @@ let config = {
     type: Phaser.CANVAS,
     width: 480,
     height: 360,
-    scene: [Menu, Play],
+    scene: [Menu, Play, Tutorial],
     physics: {
         default: 'arcade',
         arcade: {
@@ -30,4 +30,4 @@ let config = {
 
 let game = new Phaser.Game(config);
 
-let keySPACE;
+let keySPACE, keyI, keyESC, keyR;

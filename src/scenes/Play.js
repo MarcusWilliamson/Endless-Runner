@@ -87,25 +87,7 @@ class Play extends Phaser.Scene {
 
         // define keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-        // Gameover screen text
-        let menuConfig = {
-            fontFamily: 'Courier',
-            fontSize: '24px',
-            backgroundColor: '#F3B141',
-            color: '#000000',
-            align: 'right',
-            padding: {
-                top: 5,
-                bottom: 5,
-            },
-            fixedWidth: 0
-        }
-
-        this.gameOverText = this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 15, 'Game Over', menuConfig).setOrigin(0.5);
-        this.returnText = this.add.text(game.config.width / 2, game.config.height / 2, 'Press SPACE to return to menu', menuConfig).setOrigin(0.5);
-        this.gameOverText.alpha = 0;
-        this.returnText.alpha = 0;
+        keyR = this.input.keyboard.addKey('R');
     }
 
     update(time, delta) {
@@ -180,9 +162,13 @@ class Play extends Phaser.Scene {
             }
         }
 
-        if(this.canReturnToMenu && Phaser.Input.Keyboard.JustDown(keySPACE)) {
-            console.log('test');
-            this.scene.start('menuScene');
+        if(this.canReturnToMenu) {
+            if(Phaser.Input.Keyboard.JustDown(keySPACE)) {
+                this.scene.start('menuScene');
+            }
+            if(Phaser.Input.Keyboard.JustDown(keyR)) {
+                this.scene.start('playScene');
+            }
         }
     }
 
@@ -211,11 +197,26 @@ class Play extends Phaser.Scene {
     }
 
     endGame() {
+        let menuConfig = {
+            fontFamily: 'Courier',
+            fontSize: '24px',
+            backgroundColor: '#F3B141',
+            color: '#000000',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+
         this.gameOver = true;
         this.player.play('fall');
         this.player.on('animationcomplete', () => {
-            this.gameOverText.alpha = 1;
-            this.returnText.alpha = 1;
+            // Gameover screen text
+            this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 10, 'Game Over', menuConfig).setOrigin(0.5);
+            this.add.text(game.config.width / 2, game.config.height / 2, 'Press R to restart', menuConfig).setOrigin(0.5);
+            this.add.text(game.config.width / 2, game.config.height / 2 + game.config.height / 15, 'Press SPACE to return to menu', menuConfig).setOrigin(0.5);
         });
         this.canReturnToMenu = true;
     }
