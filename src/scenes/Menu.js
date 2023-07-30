@@ -3,6 +3,13 @@ class Menu extends Phaser.Scene {
         super("menuScene");
     }
 
+    preload() {
+        // load audio
+        this.load.audio('sfx_jump', './assets/jump.wav');
+        this.load.audio('sfx_hurt', './assets/hurt.wav');
+        this.load.audio('sfx_select', './assets/select.wav');
+    }
+
     create() {
          // menu text configuration
          let menuConfig = {
@@ -30,9 +37,11 @@ class Menu extends Phaser.Scene {
 
     update() {
         if(Phaser.Input.Keyboard.JustDown(keySPACE)) {
+            this.sound.play('sfx_select');
             this.scene.start("playScene");
         }
         if(Phaser.Input.Keyboard.JustDown(keyI)) {
+            this.sound.play('sfx_select');
             this.scene.start('tutorialScene');
         }
     }

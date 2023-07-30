@@ -42,6 +42,7 @@ class Tutorial extends Phaser.Scene {
 
     update() {
         if(Phaser.Input.Keyboard.JustDown(keySPACE) || Phaser.Input.Keyboard.JustDown(keyESC)) {
+            this.sound.play('sfx_select');
             this.scene.start("menuScene");
         }
     }

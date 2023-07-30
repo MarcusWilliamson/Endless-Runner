@@ -113,7 +113,7 @@ class Play extends Phaser.Scene {
             }
         }
 
-        // Player animation and jumping
+        // Player cruise animation
         if (this.player.body.touching.down) {
             // If on ground but jumping is true and gameOver is false, set to false and start cruise animation
             if (this.jumping && !this.gameOver) {
@@ -126,10 +126,12 @@ class Play extends Phaser.Scene {
             this.jumping = true;
         }
 
+        // Jumping
         if(!this.gameOver && Phaser.Input.Keyboard.JustDown(keySPACE) && !this.jumping) {
             this.player.body.setVelocityY(this.jumpVelocity);
             this.jumping = true;
             this.player.play('jump');
+            this.sound.play('sfx_jump');
         }
 
         /*if (this.player.body.touching.right) {
@@ -164,9 +166,11 @@ class Play extends Phaser.Scene {
 
         if(this.canReturnToMenu) {
             if(Phaser.Input.Keyboard.JustDown(keySPACE)) {
+                this.sound.play('sfx_select');
                 this.scene.start('menuScene');
             }
             if(Phaser.Input.Keyboard.JustDown(keyR)) {
+                this.sound.play('sfx_select');
                 this.scene.start('playScene');
             }
         }
@@ -212,12 +216,13 @@ class Play extends Phaser.Scene {
 
         this.gameOver = true;
         this.player.play('fall');
+        this.sound.play('sfx_hurt')
         this.player.on('animationcomplete', () => {
             // Gameover screen text
             this.add.text(game.config.width / 2, game.config.height / 2 - game.config.height / 10, 'Game Over', menuConfig).setOrigin(0.5);
             this.add.text(game.config.width / 2, game.config.height / 2, 'Press R to restart', menuConfig).setOrigin(0.5);
             this.add.text(game.config.width / 2, game.config.height / 2 + game.config.height / 15, 'Press SPACE to return to menu', menuConfig).setOrigin(0.5);
+            this.canReturnToMenu = true;
         });
-        this.canReturnToMenu = true;
     }
 }
