@@ -2,7 +2,15 @@
 Main header
 Marcus Williamson
 Skate Forever
-13 hours
+15 hours
+
+Creative Tilt:
+I implemented a custom object pooling function. I tried using Phaser 3's pooling using groups
+but I couldn't get it to work, so I made my own with the getInactiveTile function in play.js,
+which checks an array of existing obstacles for an inactive obstacle it needs (platform or hazard), sets
+its new location and sets it as active, and returns it. If it doesn't find one it creates a new
+one. This way I don't constantly create and destroy new obstacles, or just let them pile up off screen.
+The game has a 2000s flash game art style and the gameplay is intuitive and quick.
 
 */
 
