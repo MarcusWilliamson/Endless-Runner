@@ -54,7 +54,8 @@ class Play extends Phaser.Scene {
         // Adding the ground
         this.ground = this.add.group();
         this.tiles = [];
-
+        this.platforms = this.add.group();
+        
         this.ground1 = this.physics.add.sprite(-16, game.config.height - 64, 'ground1').setOrigin(0);
         this.ground1.body.immovable = true;
         this.ground1.body.allowGravity = false;
@@ -101,12 +102,13 @@ class Play extends Phaser.Scene {
 
         // Spawning
         this.spawnTimer += delta;
-        if (this.spawnTimer > this.spawnInterval) {
+        if (!this.gameOver && this.spawnTimer > this.spawnInterval) {
             this.spawnTimer -= this.spawnInterval;
             if(Math.random() > 0.5) {
                 this.spawnPlatform();
             } else {
                 this.spawnHazard();
+                //this.spawnPlatform();
             }
             if (this.spawnInterval > this.minSpawnInterval) {
                 this.spawnInterval -= 200;
@@ -154,6 +156,11 @@ class Play extends Phaser.Scene {
                     tile.scored = true;
                 }
             }
+            if (tile.active && tile.x < -34) {
+                //this.tiles.remove()
+                tile.setActive(false);
+                tile.setVisible(false);
+            }
         } 
 
         // Tile movement
@@ -178,13 +185,16 @@ class Play extends Phaser.Scene {
 
     // Spawn platform of random length between max and min
     spawnPlatform() {
+        //console.log(this.platforms.getTotalFree());
         let size = Math.floor(Math.random() * (this.maxPlatformLength - this.minPlatformLength + 1) + this.minPlatformLength);
         for (let i = 0; i < size; i++) {
-            let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
+            /*let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'tiles', 7, 5).setOrigin(0.25, 0);
             tile.body.immovable = true;
             tile.body.allowGravity = false;
             this.ground.add(tile);
             this.tiles.push(tile);
+            */
+           this.getInactiveTile(game.config.width + 32 * (i + 1), game.config.height - 96, false);
         }
     }
 
@@ -192,11 +202,12 @@ class Play extends Phaser.Scene {
     spawnHazard() {
         let size = Math.floor(Math.random() * (this.maxHazardLength - this.minPlatformLength + 1) + this.minPlatformLength);
         for (let i = 0; i < size; i++) {
-            let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'hazards', 0, 10, true).setOrigin(0.25, 0);
+            /*let tile = new Tile(this, game.config.width + 32 * (i + 1), game.config.height - 96, 'hazards', 0, 10, true).setOrigin(0.25, 0);
             tile.body.immovable = true;
             tile.body.allowGravity = false;
             this.ground.add(tile);
-            this.tiles.push(tile);
+            this.tiles.push(tile);*/
+            this.getInactiveTile(game.config.width + 32 * (i + 1), game.config.height - 96, true);
         }
     }
 
@@ -224,5 +235,32 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width / 2, game.config.height / 2 + game.config.height / 15, 'Press SPACE to return to menu', menuConfig).setOrigin(0.5);
             this.canReturnToMenu = true;
         });
+    }
+
+    // Gets an inactive tile and sets location. If none, creates one. (object pooling)
+    getInactiveTile(x, y, hazard) {
+        for (let tile of this.tiles) {
+            if(!tile.active && tile.isHazard == hazard) { // Find matching inactive tile
+                tile.setActive(true);
+                tile.setVisible(true);
+                tile.x = x;
+                tile.y = y;
+                //console.log('reusing');
+                return tile;
+            }
+        }
+        // If none is found, make one
+        let newTile;
+        if(hazard) {
+            newTile = new Tile(this, x, y, 'hazards', 0, 10, true).setOrigin(0.25, 0);
+        } else {
+            newTile = new Tile(this, x, y, 'tiles', 7, 5).setOrigin(0.25, 0);
+        }
+        newTile.body.immovable = true;
+        newTile.body.allowGravity = false;
+        this.ground.add(newTile);
+        this.tiles.push(newTile);
+        //console.log('created new');
+        return newTile;
     }
 }
