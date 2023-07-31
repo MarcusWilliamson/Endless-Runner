@@ -1,5 +1,4 @@
 /*
-Main header
 Marcus Williamson
 Skate Forever
 16 hours
