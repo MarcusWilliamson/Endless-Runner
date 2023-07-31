@@ -153,7 +153,7 @@ class Play extends Phaser.Scene {
             if (!tile.scored && tile.x < this.player.x + this.player.width && this.player.x < tile.x + tile.width) {
                 if (tile.isHazard || (!tile.isHazard && tile.y - this.player.y < tile.height + 2)) {
                     this.score += tile.scoreValue;
-                    console.log(tile.scoreValue);
+                    //console.log(tile.scoreValue);
                     tile.scored = true;
                 }
             }

@@ -2,7 +2,7 @@
 Main header
 Marcus Williamson
 Skate Forever
-15 hours
+16 hours
 
 Creative Tilt:
 I implemented a custom object pooling function. I tried using Phaser 3's pooling using groups
@@ -39,5 +39,7 @@ let config = {
 }
 
 let game = new Phaser.Game(config);
+
+let music;
 
 let keySPACE, keyI, keyESC, keyR;

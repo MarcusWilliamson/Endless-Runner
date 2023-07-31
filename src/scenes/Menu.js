@@ -8,6 +8,7 @@ class Menu extends Phaser.Scene {
         this.load.audio('sfx_jump', './assets/jump.wav');
         this.load.audio('sfx_hurt', './assets/hurt.wav');
         this.load.audio('sfx_select', './assets/select.wav');
+        this.load.audio('music', './assets/Next to You.mp3');
     }
 
     create() {
@@ -33,6 +34,16 @@ class Menu extends Phaser.Scene {
         // define keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         keyI = this.input.keyboard.addKey('I');
+
+        // Play music
+        if(music) {
+            music.stop();
+        }
+        
+        music = this.sound.add('music', {loop: true});
+        if (!music.isPlaying) {
+            music.play();
+        }
     }
 
     update() {
