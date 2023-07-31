@@ -10,7 +10,9 @@ but I couldn't get it to work, so I made my own with the getInactiveTile functio
 which checks an array of existing obstacles for an inactive obstacle it needs (platform or hazard), sets
 its new location and sets it as active, and returns it. If it doesn't find one it creates a new
 one. This way I don't constantly create and destroy new obstacles, or just let them pile up off screen.
-The game has a 2000s flash game art style and the gameplay is intuitive and quick.
+The game has a 2000s flash game art style and the gameplay is intuitive and quick. Although the game
+is a pretty simple, standard runner, I think it has something different in the obstacles that you can
+stand on for extra points.
 
 */
 
